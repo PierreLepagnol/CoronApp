@@ -125,12 +125,45 @@ const Homescreen=({ route, navigation }) => {
                                                  5:{name:'judiciaire',ischecked:false},
                                                  6:{name:'missions',ischecked:false}});
   const [Lag, setLag]=React.useState(20)
-  const [consdate, setConsDate]=React.useState(true)
+  const [RefreshDate, setRefreshDate]=React.useState(true)
   
   const handleCheck = (event,id) => {     
       var re=updateStateObject(reasons[id],'ischecked', !reasons[id].ischecked)
       setReasons(prev => ({...prev,[id]:re}));
   }
+ const HandleGenerate=()=>{
+   let now;
+   if(RefreshDate){
+    /* Enregistrement */
+    AsyncStorage.setItem('@QrCodeDate',JSON.stringify(new Date().toJSON()))
+                .then(()=>{AsyncStorage.getItem('@QrCodeDate')
+                            .then(now=>{
+                              
+                              console.log(now)
+                              navigation.navigate('QRCodeModal',{reasons,Lag,now})
+                            })})
+                
+  }else{
+    AsyncStorage.getItem('@QrCodeDate').then(now=>{
+      console.log(now)
+      navigation.navigate('QRCodeModal',{reasons,Lag,now})
+    })
+  } 
+
+    /* AsyncStorage.getItem('@QrCodeDate').then((value)=>{
+      if(value==null){
+        AsyncStorage.setItem('@QrCodeDate',JSON.stringify(Date.now().toJSON())).then((value)=>{
+          
+        })        
+      }else{
+        console.log('Not nullrr')
+        navigation.navigate('QRCodeModal',{reasons,Lag,now:Date.parse(JSON.parse(value))})
+      }
+    })
+   }else{
+    navigation.navigate('QRCodeModal',{reasons,Lag,now:new Date()})
+    */  
+ }
 
   return (
     <SafeAreaView style={{flex:1}}>
@@ -141,7 +174,7 @@ const Homescreen=({ route, navigation }) => {
         <View style={{flex:0.9}}>
           <View style={{justifyContent:'space-around',alignItems:"center",flex:0.4}}>
             <Icon.Button name='qrcode' backgroundColor={colors.info} size={30} borderRadius={10}
-                        onPress={() => navigation.navigate('QRCodeModal',{reasons,Lag})}>
+                        onPress={HandleGenerate}>
                 <Text style={{color:colors.white,fontSize:20}}>Générer mon attestation</Text>
             </Icon.Button>    
 
@@ -157,7 +190,7 @@ const Homescreen=({ route, navigation }) => {
           textStyle={{fontSize:15}} 
           checkedIcon='check-square-o' checkedColor={colors.red}
           uncheckedIcon='square-o'uncheckedColor={colors.gray}
-          checked={consdate} onPress={(event) => setConsDate(!consdate)} />
+          checked={RefreshDate} onPress={() => setRefreshDate(!RefreshDate)} />
           </View>
 
           <ScrollView style={{flex:0.6}}>
