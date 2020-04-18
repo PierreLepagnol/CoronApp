@@ -1,0 +1,4 @@
+export const FormContext = React.createContext({
+  form: 'Hello',  HandleChange: () => {},});
+
+  const style={info:{fontSize:25,letterSpacing:2}}
